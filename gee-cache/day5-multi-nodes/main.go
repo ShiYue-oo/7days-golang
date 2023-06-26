@@ -34,8 +34,8 @@ func createGroup() *geecache.Group {
 }
 
 func startCacheServer(addr string, addrs []string, gee *geecache.Group) {
-	peers := geecache.NewHTTPPool(addr)
-	peers.Set(addrs...)
+	peers := geecache.NewHTTPPool(addr) //用自己的addr初始化，再把其它节点也加进去
+	peers.Set(addrs...)                 //将httppool初始化好再注入到Group中
 	gee.RegisterPeers(peers)
 	log.Println("geecache is running at", addr)
 	log.Fatal(http.ListenAndServe(addr[7:], peers))
@@ -82,5 +82,5 @@ func main() {
 	if api {
 		go startAPIServer(apiAddr, gee)
 	}
-	startCacheServer(addrMap[port], addrs, gee)
+	startCacheServer(addrMap[port], addrs, gee) //脚本里的请求，三个请求都是并发执行的，所以每次执行结果可能会不一样， 四个节点其实都是 一个缓存。
 }

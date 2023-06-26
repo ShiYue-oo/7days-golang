@@ -23,7 +23,7 @@ type HTTPPool struct {
 	basePath    string
 	mu          sync.Mutex // guards peers and httpGetters
 	peers       *consistenthash.Map
-	httpGetters map[string]*httpGetter // keyed by e.g. "http://10.0.0.2:8008"
+	httpGetters map[string]*httpGetter // keyed by e.g. "http://10.0.0.2:8008" 每个节点string对应一个httpgetter
 }
 
 // NewHTTPPool initializes an HTTP pool of peers.
@@ -44,7 +44,7 @@ func (p *HTTPPool) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if !strings.HasPrefix(r.URL.Path, p.basePath) {
 		panic("HTTPPool serving unexpected path: " + r.URL.Path)
 	}
-	p.Log("%s %s", r.Method, r.URL.Path)
+	p.Log("%s =======%s", r.Method, r.URL.Path)
 	// /<basepath>/<groupname>/<key> required
 	parts := strings.SplitN(r.URL.Path[len(p.basePath):], "/", 2)
 	if len(parts) != 2 {
@@ -72,24 +72,26 @@ func (p *HTTPPool) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // Set updates the pool's list of peers.
-func (p *HTTPPool) Set(peers ...string) {
+func (p *HTTPPool) Set(peers ...string) { //Set() 方法实例化了一致性哈希算法，并且添加了传入的节点。并为每一个节点创建了一个 HTTP 客户端 httpGetter
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.peers = consistenthash.New(defaultReplicas, nil)
 	p.peers.Add(peers...)
 	p.httpGetters = make(map[string]*httpGetter, len(peers))
 	for _, peer := range peers {
-		p.httpGetters[peer] = &httpGetter{baseURL: peer + p.basePath}
+		p.httpGetters[peer] = &httpGetter{baseURL: peer + p.basePath} //peer就是每个节点的名字，是独一无二的，basePath是公用的，只是一种习惯而已，在url前要加一个基础的公用名称
 	}
 }
 
+// 访问的时候是，先用键运行一致性哈希的算法，得到实际的节点string，在用实际节点string得到httpgetter
 // PickPeer picks a peer according to key
+// PickerPeer() 包装了一致性哈希算法的 Get() 方法，根据具体的 key，选择节点，返回节点对应的 HTTP 客户端。
 func (p *HTTPPool) PickPeer(key string) (PeerGetter, bool) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	if peer := p.peers.Get(key); peer != "" && peer != p.self {
+	if peer := p.peers.Get(key); peer != "" && peer != p.self { //得到的节点不是自己
 		p.Log("Pick peer %s", peer)
-		return p.httpGetters[peer], true
+		return p.httpGetters[peer], true //返回对应节点的httpGetter
 	}
 	return nil, false
 }
@@ -100,7 +102,7 @@ type httpGetter struct {
 	baseURL string
 }
 
-func (h *httpGetter) Get(group string, key string) ([]byte, error) {
+func (h *httpGetter) Get(group string, key string) ([]byte, error) { // 构造好请求url，请求远程节点数据
 	u := fmt.Sprintf(
 		"%v%v/%v",
 		h.baseURL,

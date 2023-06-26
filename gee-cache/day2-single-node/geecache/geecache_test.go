@@ -31,7 +31,7 @@ func TestGet(t *testing.T) {
 			log.Println("[SlowDB] search key", key)
 			if v, ok := db[key]; ok {
 				if _, ok := loadCounts[key]; !ok {
-					loadCounts[key] = 0
+					loadCounts[key] = 0 //缓存没这个值，且第一次调用回调函数
 				}
 				loadCounts[key]++
 				return []byte(v), nil
@@ -42,10 +42,10 @@ func TestGet(t *testing.T) {
 	for k, v := range db {
 		if view, err := gee.Get(k); err != nil || view.String() != v {
 			t.Fatal("failed to get value of Tom")
-		}
+		} //三个值都是在这里调用的时候调回调函数，从map得到值存入缓存，
 		if _, err := gee.Get(k); err != nil || loadCounts[k] > 1 {
 			t.Fatalf("cache %s miss", k)
-		}
+		} //在这里第二次查询时缓存命中
 	}
 
 	if view, err := gee.Get("unknown"); err == nil {

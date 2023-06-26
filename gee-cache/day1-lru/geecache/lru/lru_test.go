@@ -1,6 +1,7 @@
 package lru
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -46,9 +47,11 @@ func TestOnEvicted(t *testing.T) {
 	lru.Add("k2", String("k2"))
 	lru.Add("k3", String("k3"))
 	lru.Add("k4", String("k4"))
-
+	//lru.RemoveOldest()
+	//lru.RemoveOldest()
 	expect := []string{"key1", "k2"}
-
+	//expect := []string{}
+	fmt.Println(keys)
 	if !reflect.DeepEqual(expect, keys) {
 		t.Fatalf("Call OnEvicted failed, expect keys equals to %s", expect)
 	}

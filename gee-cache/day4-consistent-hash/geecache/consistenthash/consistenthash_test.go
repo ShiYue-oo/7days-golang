@@ -8,7 +8,7 @@ import (
 func TestHashing(t *testing.T) {
 	hash := New(3, func(key []byte) uint32 {
 		i, _ := strconv.Atoi(string(key))
-		return uint32(i)
+		return uint32(i) //就是直接把数字构成的字符串转换成数字
 	})
 
 	// Given the above hash function, this will give replicas with "hashes":

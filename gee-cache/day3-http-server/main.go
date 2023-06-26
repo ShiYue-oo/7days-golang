@@ -34,5 +34,5 @@ func main() {
 	addr := "localhost:9999"
 	peers := geecache.NewHTTPPool(addr)
 	log.Println("geecache is running at", addr)
-	log.Fatal(http.ListenAndServe(addr, peers))
+	log.Fatal(http.ListenAndServe(addr, peers)) // 服务开启之后，浏览器访问地址，内部先查询缓存，如果没有命中再调用回调函数，查询map，再将查询到的值返回到response中。
 }

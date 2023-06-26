@@ -62,12 +62,12 @@ func (g *Group) Get(key string) (ByteView, error) {
 	if key == "" {
 		return ByteView{}, fmt.Errorf("key is required")
 	}
-
+	log.Println("-------------------")
 	if v, ok := g.mainCache.get(key); ok {
 		log.Println("[GeeCache] hit")
 		return v, nil
 	}
-
+	log.Println("-------------------")
 	return g.load(key)
 }
 
@@ -79,10 +79,12 @@ func (g *Group) RegisterPeers(peers PeerPicker) {
 	g.peers = peers
 }
 
+// 原来是直接调用getlocally 调回调函数，现在是先从远程节点找找有没有这个值
 func (g *Group) load(key string) (value ByteView, err error) {
 	if g.peers != nil {
-		if peer, ok := g.peers.PickPeer(key); ok {
-			if value, err = g.getFromPeer(peer, key); err == nil {
+		if peer, ok := g.peers.PickPeer(key); ok { // 先找节点，得到httpgetter后，再查值
+			log.Println("======================")
+			if value, err = g.getFromPeer(peer, key); err == nil { //有了httpgetter 和 key，直接查就可以，getfrompeer非常简单
 				return value, nil
 			}
 			log.Println("[GeeCache] Failed to get from peer", err)

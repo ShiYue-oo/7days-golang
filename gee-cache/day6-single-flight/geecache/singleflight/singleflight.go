@@ -5,7 +5,7 @@ import "sync"
 // call is an in-flight or completed Do call
 type call struct {
 	wg  sync.WaitGroup
-	val interface{}
+	val interface{} //interface{} 是一种特殊的类型，可以表示任意类型的值。
 	err error
 }
 

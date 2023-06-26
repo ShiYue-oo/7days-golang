@@ -51,7 +51,7 @@ func (m *Map) Get(key string) string {
 	hash := int(m.hash([]byte(key)))
 	// Binary search for appropriate replica.
 	idx := sort.Search(len(m.keys), func(i int) bool {
-		return m.keys[i] >= hash
+		return m.keys[i] >= hash //顺时针找到第一个匹配的虚拟节点的下标 idx
 	})
 
 	return m.hashMap[m.keys[idx%len(m.keys)]]
