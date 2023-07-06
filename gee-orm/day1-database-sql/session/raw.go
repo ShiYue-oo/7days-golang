@@ -10,8 +10,8 @@ import (
 // kind of database operations.
 type Session struct {
 	db      *sql.DB
-	sql     strings.Builder
-	sqlVars []interface{}
+	sql     strings.Builder   // sql语句
+	sqlVars []interface{} //sql语句中的值
 }
 
 // New creates a instance of Session
@@ -49,7 +49,7 @@ func (s *Session) QueryRow() *sql.Row {
 
 // QueryRows gets a list of records from db
 func (s *Session) QueryRows() (rows *sql.Rows, err error) {
-	defer s.Clear()
+	defer s.Clear()   //执行完成后清空session
 	log.Info(s.sql.String(), s.sqlVars)
 	if rows, err = s.DB().Query(s.sql.String(), s.sqlVars...); err != nil {
 		log.Error(err)

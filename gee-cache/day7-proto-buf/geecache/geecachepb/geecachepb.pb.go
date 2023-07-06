@@ -111,6 +111,7 @@ func init() {
 	proto.RegisterType((*Response)(nil), "geecachepb.Response")
 }
 
+
 func init() { proto.RegisterFile("geecachepb.proto", fileDescriptor_889d0a4ad37a0d42) }
 
 var fileDescriptor_889d0a4ad37a0d42 = []byte{

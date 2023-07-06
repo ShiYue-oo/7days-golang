@@ -11,7 +11,7 @@ var generators map[Type]generator
 
 func init() {
 	generators = make(map[Type]generator)
-	generators[INSERT] = _insert
+	generators[INSERT] = _insert   //函数
 	generators[VALUES] = _values
 	generators[SELECT] = _select
 	generators[LIMIT] = _limit

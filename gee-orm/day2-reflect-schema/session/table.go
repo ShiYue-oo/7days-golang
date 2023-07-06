@@ -9,7 +9,7 @@ import (
 	"geeorm/schema"
 )
 
-// Model assigns refTable
+// Model assigns refTable Model() 方法用于给 refTable 赋值。
 func (s *Session) Model(value interface{}) *Session {
 	// nil or different model, update refTable
 	if s.refTable == nil || reflect.TypeOf(value) != reflect.TypeOf(s.refTable.Model) {
@@ -19,6 +19,7 @@ func (s *Session) Model(value interface{}) *Session {
 }
 
 // RefTable returns a Schema instance that contains all parsed fields
+// RefTable() 方法返回 refTable 的值
 func (s *Session) RefTable() *schema.Schema {
 	if s.refTable == nil {
 		log.Error("Model is not set")
@@ -27,6 +28,8 @@ func (s *Session) RefTable() *schema.Schema {
 }
 
 // CreateTable create a table in database with a model
+// 三个方法的实现逻辑是相似的，利用 RefTable() 返回的数据库表和字段的信息，拼接出 SQL 语句，
+// 调用原生 SQL 接口执行。
 func (s *Session) CreateTable() error {
 	table := s.RefTable()
 	var columns []string

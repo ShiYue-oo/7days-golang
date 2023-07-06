@@ -42,6 +42,7 @@ type ITableName interface {
 }
 
 // Parse a struct to a Schema instance
+// 这个函数是用来将一个结构体解析成一个Schema实例的。它接受两个参数：dest表示要解析的结构体实例，d表示数据库方言。
 func Parse(dest interface{}, d dialect.Dialect) *Schema {
 	modelType := reflect.Indirect(reflect.ValueOf(dest)).Type()
 	var tableName string

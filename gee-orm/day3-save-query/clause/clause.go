@@ -13,7 +13,7 @@ type Clause struct {
 // Type is the type of Clause
 type Type int
 
-// Support types for Clause
+
 const (
 	INSERT Type = iota
 	VALUES
@@ -24,6 +24,7 @@ const (
 )
 
 // Set adds a sub clause of specific type
+// Set 方法根据 Type 调用对应的 generator，生成该子句对应的 SQL 语句。
 func (c *Clause) Set(name Type, vars ...interface{}) {
 	if c.sql == nil {
 		c.sql = make(map[Type]string)
@@ -35,6 +36,8 @@ func (c *Clause) Set(name Type, vars ...interface{}) {
 }
 
 // Build generate the final SQL and SQLVars
+// Build 方法根据传入的 Type 的顺序，构造出最终的 SQL 语句。
+// sql, vars := clause.Build(SELECT, WHERE, ORDERBY, LIMIT)
 func (c *Clause) Build(orders ...Type) (string, []interface{}) {
 	var sqls []string
 	var vars []interface{}
@@ -46,3 +49,4 @@ func (c *Clause) Build(orders ...Type) (string, []interface{}) {
 	}
 	return strings.Join(sqls, " "), vars
 }
+//整个文件就是用来构造sql语句的，generator是构造子句的一堆函数
